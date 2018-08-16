@@ -1,4 +1,4 @@
-import { Request } from 'apollo-server-env';
+import { Request } from 'apollo-server-env/dist/fetch';
 
 import {
   GraphQLResolveInfo,
