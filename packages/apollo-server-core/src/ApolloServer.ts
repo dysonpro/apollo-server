@@ -1,3 +1,8 @@
+/**TODO
+ * Factor out Engine or only require its type.
+ *
+ */
+
 import { makeExecutableSchema, addMockFunctionsToSchema } from 'graphql-tools';
 import { Server as HttpServer } from 'http';
 import {
@@ -11,7 +16,7 @@ import {
   FieldDefinitionNode,
 } from 'graphql';
 import { GraphQLExtension } from 'graphql-extensions';
-import { EngineReportingAgent } from 'apollo-engine-reporting';
+// TOFIX import { EngineReportingAgent } from 'apollo-engine-reporting/dist/agent';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 
 import {
@@ -35,7 +40,8 @@ import {
 
 import { FormatErrorExtension } from './formatters';
 
-import { gql } from './index';
+// import { gql } from './index';
+import gql from 'graphql-tag';
 
 import {
   createPlaygroundOptions,
@@ -61,7 +67,7 @@ export class ApolloServerBase {
   public requestOptions: Partial<GraphQLOptions<any>>;
 
   private context?: Context | ContextFunction;
-  private engineReportingAgent?: EngineReportingAgent;
+  // TOFIX private engineReportingAgent?: EngineReportingAgent;
   private extensions: Array<() => GraphQLExtension>;
 
   protected schema: GraphQLSchema;
@@ -175,22 +181,23 @@ export class ApolloServerBase {
         `,
       );
 
-      if (this.uploadsConfig) {
-        const {
-          GraphQLUpload,
-        } = require('@apollographql/apollo-upload-server');
-        if (resolvers && !resolvers.Upload) {
-          resolvers.Upload = GraphQLUpload;
-        }
+      // TOFIX
+      // if (this.uploadsConfig) {
+      //   const {
+      //     GraphQLUpload,
+      //   } = require('@apollographql/apollo-upload-server');
+      //   if (resolvers && !resolvers.Upload) {
+      //     resolvers.Upload = GraphQLUpload;
+      //   }
 
-        // We augment the typeDefs with the Upload scalar, so typeDefs that
-        // don't include it won't fail
-        augmentedTypeDefs.push(
-          gql`
-            scalar Upload
-          `,
-        );
-      }
+      //   // We augment the typeDefs with the Upload scalar, so typeDefs that
+      //   // don't include it won't fail
+      //   augmentedTypeDefs.push(
+      //     gql`
+      //       scalar Upload
+      //     `,
+      //   );
+      // }
 
       this.schema = makeExecutableSchema({
         typeDefs: augmentedTypeDefs,
@@ -227,6 +234,7 @@ export class ApolloServerBase {
       );
     }
 
+    /* TOFIX
     if (engine || (engine !== false && process.env.ENGINE_API_KEY)) {
       this.engineReportingAgent = new EngineReportingAgent(
         engine === true ? {} : engine,
@@ -234,6 +242,7 @@ export class ApolloServerBase {
       // Let's keep this extension second so it wraps everything, except error formatting
       this.extensions.push(() => this.engineReportingAgent!.newExtension());
     }
+    */
 
     if (extensions) {
       this.extensions = [...this.extensions, ...extensions];
@@ -276,10 +285,11 @@ export class ApolloServerBase {
 
   public async stop() {
     if (this.subscriptionServer) await this.subscriptionServer.close();
-    if (this.engineReportingAgent) {
-      this.engineReportingAgent.stop();
-      await this.engineReportingAgent.sendReport();
-    }
+    // TOFIX
+    // if (this.engineReportingAgent) {
+    //   this.engineReportingAgent.stop();
+    //   await this.engineReportingAgent.sendReport();
+    // }
   }
 
   public installSubscriptionHandlers(server: HttpServer) {
